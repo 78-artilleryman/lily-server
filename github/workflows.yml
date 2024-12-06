@@ -1,0 +1,39 @@
+name: Deploy to EC2 via CodeDeploy
+
+on:
+  push:
+    branches:
+      - main # main 브랜치에 푸시할 때 자동 배포
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # pnpm 설치
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # pnpm으로 의존성 설치
+      - name: Install dependencies
+        run: pnpm install
+
+      # 프로젝트 빌드
+      - name: Build the project
+        run: pnpm run build # 빌드를 위한 pnpm 명령어
+
+      # AWS 자격 증명 설정
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2 # 사용 중인 리전
+
+      # S3에 파일 업로드
+      - name: Upload files to S3
+        run: |
+          aws s3 cp ./dist s3://lily-server-s3/lily-server-code/ --recursive
