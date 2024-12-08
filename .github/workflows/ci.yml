@@ -25,6 +25,11 @@ jobs:
       - name: Build the project
         run: pnpm run build # 빌드를 위한 pnpm 명령어
 
+      # dist 디렉토리 압축
+      - name: Compress dist folder
+        run: |
+          zip -r dist.zip dist
+
       # AWS 자격 증명 설정
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -36,4 +41,4 @@ jobs:
       # S3에 파일 업로드
       - name: Upload files to S3
         run: |
-          aws s3 cp ./dist s3://lily-server-s3/lily-server-code/ --recursive
+          aws s3 cp ./dist s3://lily-server-s3/ --recursive
