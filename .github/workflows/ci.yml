@@ -38,7 +38,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2 # 사용 중인 리전
 
-      # S3에 파일 업로드
-      - name: Upload files to S3
+  # S3에 압축 파일 업로드
+      - name: Upload compressed file to S3
         run: |
-          aws s3 cp ./dist s3://lily-server-s3/ --recursive
+          aws s3 cp dist.zip s3://lily-server-s3/
