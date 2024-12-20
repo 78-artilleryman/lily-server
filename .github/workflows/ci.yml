@@ -45,12 +45,12 @@ jobs:
           aws s3 cp dist.zip s3://lily-server-s3/
 
       # CodeDeploy를 사용하여 배포
-      # - name: Deploy to EC2 via CodeDeploy
-      #   run: |
-      #     # S3에서 EC2로 CodeDeploy를 통해 배포
-      #     aws deploy create-deployment \
-      #       --application-name lily-server \
-      #       --deployment-config-name CodeDeployDefault.AllAtOnce \
-      #       --deployment-group-name lily-server-deploy \
-      #       --s3-location bucket=lily-server-s3,bundleType=zip,key=dist.zip
-      #       --description "Deploying new version"
+      - name: Deploy to EC2 via CodeDeploy
+        run: |
+          # S3에서 EC2로 CodeDeploy를 통해 배포
+          aws deploy create-deployment \
+            --application-name lily-web-server \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name lily-web-server-dg \
+            --s3-location bucket=lily-server-s3,bundleType=zip,key=dist.zip
+            --description "Deploying new version"
