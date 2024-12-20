@@ -50,7 +50,7 @@ jobs:
           # S3에서 EC2로 CodeDeploy를 통해 배포
           aws deploy create-deployment \
             --application-name lily-server \
-            --deployment-group-name lily-server-deploy \
-            --revision revisionType=S3,s3Location={bucketName=lily-server-s3,bundleType=zip,key=dist.zip} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name lily-server-deploy \
+            --s3-location bucket=lily-server-s3,bundleType=zip,key=dist.zip
             --description "Deploying new version"
