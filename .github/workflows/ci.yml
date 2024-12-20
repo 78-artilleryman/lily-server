@@ -49,8 +49,8 @@ jobs:
         run: |
           # S3에서 EC2로 CodeDeploy를 통해 배포
           aws deploy create-deployment \
-            --application-name your-codedeploy-application-name \
-            --deployment-group-name your-deployment-group-name \
+            --application-name lily-server \
+            --deployment-group-name lily-server-deploy \
             --revision revisionType=S3,s3Location={bucketName=lily-server-s3,bundleType=zip,key=dist.zip} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --description "Deploying new version"
