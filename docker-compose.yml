@@ -10,9 +10,9 @@ services:
       - '80: 80'
     volumes: -./nginx/nginx. conf:/etc/nginx/nginx.conf
 
-app:
+app-server:
   build: .
-  container_name: app
+  container_name: app-server
   restart: always
   ports:
     - '3001:3001'

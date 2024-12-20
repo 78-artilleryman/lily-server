@@ -2,7 +2,7 @@
 FROM node:18
 
 # 작업 디렉터리 설정
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app-server
 
 # pnpm 설치
 RUN npm install -g pnpm
