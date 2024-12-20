@@ -16,8 +16,7 @@ RUN pnpm install
 # Prisma Migrate 실행 (데이터베이스 연결을 위한 마이그레이션 적용)
 RUN npx prisma migrate deploy
 
-# .env 파일을 Docker 이미지에 복사
-COPY .env .env
+COPY . .
 
 # 애플리케이션 빌드
 RUN pnpm run build
