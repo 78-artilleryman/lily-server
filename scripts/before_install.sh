@@ -39,3 +39,10 @@ sudo apt-get install -y awscli
 
 # 스크립트 실행 권한 설정
 sudo chmod +x /home/ubuntu/app/scripts/*.sh
+
+if [ -d /home/ubuntu/app ]; then
+    rm -rf /home/ubuntu/app/*
+fi
+
+mkdir -p /home/ubuntu/app
+mkdir -p /home/ubuntu/app/scripts
