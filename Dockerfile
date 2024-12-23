@@ -17,7 +17,7 @@ RUN npm install -g @nestjs/cli
 COPY . .
 
 # 환경 설정 파일 복사
-COPY build.env build.env
+COPY .env .env
 
 # Prisma 데이터베이스 마이그레이션 실행
 RUN npx prisma migrate deploy
