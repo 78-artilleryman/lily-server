@@ -47,13 +47,13 @@ jobs: # 실행할 작업을 정의합니다.
           docker push $ECR_REGISTRY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY:$IMAGE_TAG"  # 빌드된 이미지 URL을 워크플로우 출력으로 설정
 
-          - name: Create deployment package
-          run: |
-            mkdir -p deploy
-            cp -r scripts deploy/
-            cp appspec.yml deploy/
-            cp codedeploy.env deploy/
-            cd deploy && zip -r ../deploy.zip .
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy
+          cp -r scripts deploy/
+          cp appspec.yml deploy/
+          cp codedeploy.env deploy/
+          cd deploy && zip -r ../deploy.zip .
 
       - name: Upload to S3
         run: |
