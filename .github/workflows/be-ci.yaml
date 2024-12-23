@@ -16,10 +16,15 @@ jobs: # 실행할 작업을 정의합니다.
       - name: Checkout # 소스 코드를 체크아웃하는 단계
         uses: actions/checkout@v3 # GitHub 제공 체크아웃 액션 사용
 
-      - name: Create .env file
+      - name: Create build .env file
         run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
-          echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > build.env
+          echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> build.env
+
+      - name: Create codedeploy .env file
+        run: |
+          echo "ECR_REGISTRY=${{ secrets.ECR_REGISTRY }}" > codedeploy.env
+          echo "IMAGE_TAG=${{ github.sha }}" >> codedeploy.env
 
       - name: Config AWS credentials # AWS 자격 증명을 구성하는 단계
         uses: aws-actions/configure-aws-credentials@v2 # AWS 자격 증명 구성 액션 사용
@@ -42,12 +47,13 @@ jobs: # 실행할 작업을 정의합니다.
           docker push $ECR_REGISTRY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY:$IMAGE_TAG"  # 빌드된 이미지 URL을 워크플로우 출력으로 설정
 
-      - name: Create deployment package
-        run: |
-          mkdir -p deploy
-          cp -r scripts deploy/
-          cp appspec.yml deploy/
-          cd deploy && zip -r ../deploy.zip .
+          - name: Create deployment package
+          run: |
+            mkdir -p deploy
+            cp -r scripts deploy/
+            cp appspec.yml deploy/
+            cp codedeploy.env deploy/
+            cd deploy && zip -r ../deploy.zip .
 
       - name: Upload to S3
         run: |
