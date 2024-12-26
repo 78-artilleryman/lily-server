@@ -9,4 +9,4 @@ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS
 docker pull $ECR_REGISTRY:$IMAGE_TAG
 
 # 새 컨테이너 실행
-docker run -d -p 80:3001 --name app $ECR_REGISTRY:$IMAGE_TAG 
+docker run -d -p 3001:3001 --name app $ECR_REGISTRY:$IMAGE_TAG 
