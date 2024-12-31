@@ -1,68 +1,68 @@
-name: Dockerizing to Amazon ECR # 워크플로우의 이름을 'Dockerizing to Amazon ECR'로 설정합니다.
+# name: Dockerizing to Amazon ECR # 워크플로우의 이름을 'Dockerizing to Amazon ECR'로 설정합니다.
 
-on:
-  push: # 특정 브랜치에 코드가 푸시될 때 워크플로우가 트리거됩니다.
-    branches: ['main'] # 'main' 브랜치에 푸시될 때만 워크플로우 실행
-  pull_request: # 풀 리퀘스트가 열리거나 업데이트될 때 트리거됩니다.
-    branches: ['main'] # 'main' 브랜치에 대한 풀 리퀘스트일 때만 실행
+# on:
+#   push: # 특정 브랜치에 코드가 푸시될 때 워크플로우가 트리거됩니다.
+#     branches: ['main'] # 'main' 브랜치에 푸시될 때만 워크플로우 실행
+#   pull_request: # 풀 리퀘스트가 열리거나 업데이트될 때 트리거됩니다.
+#     branches: ['main'] # 'main' 브랜치에 대한 풀 리퀘스트일 때만 실행
 
-jobs: # 실행할 작업을 정의합니다.
-  deploy: # 'deploy'라는 작업을 정의합니다.
-    name: Deploy # 작업의 이름을 'Deploy'로 설정
-    runs-on: ubuntu-latest # 최신 Ubuntu 버전에서 실행되도록 설정
-    environment: production # 이 작업이 'production' 환경에서 실행됨을 정의
+# jobs: # 실행할 작업을 정의합니다.
+#   deploy: # 'deploy'라는 작업을 정의합니다.
+#     name: Deploy # 작업의 이름을 'Deploy'로 설정
+#     runs-on: ubuntu-latest # 최신 Ubuntu 버전에서 실행되도록 설정
+#     environment: production # 이 작업이 'production' 환경에서 실행됨을 정의
 
-    steps: # 이 작업에서 실행될 단계들을 정의합니다.
-      - name: Checkout # 소스 코드를 체크아웃하는 단계
-        uses: actions/checkout@v3 # GitHub 제공 체크아웃 액션 사용
+#     steps: # 이 작업에서 실행될 단계들을 정의합니다.
+#       - name: Checkout # 소스 코드를 체크아웃하는 단계
+#         uses: actions/checkout@v3 # GitHub 제공 체크아웃 액션 사용
 
-      - name: Create .env file
-        run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
-          echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> .env
+#       - name: Create .env file
+#         run: |
+#           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
+#           echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> .env
 
-      - name: Create codedeploy .env file
-        run: |
-          echo "ECR_REGISTRY=${{ secrets.ECR_REGISTRY }}" > codedeploy.env
-          echo "IMAGE_TAG=${{ github.sha }}" >> codedeploy.env
+#       - name: Create codedeploy .env file
+#         run: |
+#           echo "ECR_REGISTRY=${{ secrets.ECR_REGISTRY }}" > codedeploy.env
+#           echo "IMAGE_TAG=${{ github.sha }}" >> codedeploy.env
 
-      - name: Config AWS credentials # AWS 자격 증명을 구성하는 단계
-        uses: aws-actions/configure-aws-credentials@v2 # AWS 자격 증명 구성 액션 사용
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }} # 사용 중인 리전
+#       - name: Config AWS credentials # AWS 자격 증명을 구성하는 단계
+#         uses: aws-actions/configure-aws-credentials@v2 # AWS 자격 증명 구성 액션 사용
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ secrets.AWS_REGION }} # 사용 중인 리전
 
-      - name: Login To Amazon ECR # Amazon ECR에 로그인하는 단계
-        id: login-ecr # 이 단계의 ID를 'login-ecr'로 설정 (후속 단계에서 참조 가능)
-        uses: aws-actions/amazon-ecr-login@v1 # Amazon ECR 로그인 액션 사용
+#       - name: Login To Amazon ECR # Amazon ECR에 로그인하는 단계
+#         id: login-ecr # 이 단계의 ID를 'login-ecr'로 설정 (후속 단계에서 참조 가능)
+#         uses: aws-actions/amazon-ecr-login@v1 # Amazon ECR 로그인 액션 사용
 
-      - name: Build, tag, and push image to Amazon ECR # Docker 이미지를 빌드, 태그, ECR에 푸시하는 단계
-        id: build-image # 이 단계의 ID를 'build-image'로 설정
-        env:
-          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }} # ECR 레지스트리 URL 설정
-          IMAGE_TAG: ${{ github.sha }} # GitHub의 커밋 SHA 값을 이미지 태그로 사용
-        run: |
-          docker build -t $ECR_REGISTRY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY:$IMAGE_TAG"  # 빌드된 이미지 URL을 워크플로우 출력으로 설정
+#       - name: Build, tag, and push image to Amazon ECR # Docker 이미지를 빌드, 태그, ECR에 푸시하는 단계
+#         id: build-image # 이 단계의 ID를 'build-image'로 설정
+#         env:
+#           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }} # ECR 레지스트리 URL 설정
+#           IMAGE_TAG: ${{ github.sha }} # GitHub의 커밋 SHA 값을 이미지 태그로 사용
+#         run: |
+#           docker build -t $ECR_REGISTRY:$IMAGE_TAG .
+#           docker push $ECR_REGISTRY:$IMAGE_TAG
+#           echo "::set-output name=image::$ECR_REGISTRY:$IMAGE_TAG"  # 빌드된 이미지 URL을 워크플로우 출력으로 설정
 
-      - name: Create deployment package
-        run: |
-          mkdir -p deploy
-          cp -r scripts deploy/
-          cp appspec.yml deploy/
-          cp codedeploy.env deploy/
-          cd deploy && zip -r ../deploy.zip .
+#       - name: Create deployment package
+#         run: |
+#           mkdir -p deploy
+#           cp -r scripts deploy/
+#           cp appspec.yml deploy/
+#           cp codedeploy.env deploy/
+#           cd deploy && zip -r ../deploy.zip .
 
-      - name: Upload to S3
-        run: |
-          aws s3 cp deploy.zip s3://${{ secrets.S3_BUCKET }}/deploy.zip
+#       - name: Upload to S3
+#         run: |
+#           aws s3 cp deploy.zip s3://${{ secrets.S3_BUCKET }}/deploy.zip
 
-      - name: Create CodeDeploy Deployment
-        run: |
-          aws deploy create-deployment \
-            --application-name lily-server-deploy \
-            --deployment-group-name lily-server-deploy-group \
-            --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=deploy.zip \
-            --region ${{ secrets.AWS_REGION }}
+#       - name: Create CodeDeploy Deployment
+#         run: |
+#           aws deploy create-deployment \
+#             --application-name lily-server-deploy \
+#             --deployment-group-name lily-server-deploy-group \
+#             --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=deploy.zip \
+#             --region ${{ secrets.AWS_REGION }}
