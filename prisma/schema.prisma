@@ -11,42 +11,32 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model User {
+  id          String  @id @default(cuid())
+  email       String? @unique
+  name        String?
+  profileImage String?
+  provider    String
+  providerId  String
+  refreshToken String?  // Refresh Token 필드 추가
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  accounts    Account[] // 다대일 관계 설정
+  @@unique([provider, providerId])
+}
+
 model Account {
   id                 String  @id @default(cuid())
   userId             String
-  type               String
   provider           String
   providerAccountId  String
   refresh_token      String?  @db.Text
-  refresh_token_expires_in    Int?
   access_token       String?  @db.Text
-  expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model User {
-  id            String     @id @default(uuid())                // 유저 고유번호
-  email         String?    @unique @db.VarChar(255)            // 유저 이메일
-  name          String?   @db.VarChar(255)                     // 유저 이름
-  emailVerified DateTime? @db.Timestamptz(6)                    
-  image         String?                                        // 유저 프로필 이미지
-  created_at    DateTime? @default(now()) @db.Timestamptz(6)   // 만든날짜
-  accounts      Account[]
-  sessions      Session[]
-}

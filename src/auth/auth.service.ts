@@ -31,9 +31,9 @@ export class AuthService {
     const { email, name } = req.user;
 
     // 사용자 정보 저장 (이미 존재하면 업데이트 또는 무시)
-    // const existingUser = await this.prisma.user.findUnique({
-    //   where: { email },
-    // });
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
     if (!existingUser) {
       return this.prisma.user.create({
