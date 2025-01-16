@@ -4,10 +4,11 @@ import { AuthController } from './auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { KakaoStrategy } from './strategies/kakao.strategy';
 
 @Module({
   imports: [PassportModule, PrismaModule],
   controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy],
+  providers: [AuthService, GoogleStrategy, KakaoStrategy],
 })
 export class AuthModule {}
