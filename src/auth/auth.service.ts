@@ -1,49 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly userService: UserService) {}
 
-  async googleLogin(req: any) {
-    if (!req.user) {
-      return 'No user from Google';
-    }
-    const { email, name } = req.user;
+  // 소셜 로그인
+  async socialLogin(provider: string, profile: any) {
+    const { id, email, name, picture } = profile;
 
-    // 사용자 정보 저장 (이미 존재하면 업데이트 또는 무시)
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email },
-    });
+    // 기존 사용자 검색
+    let user = await this.userService.findBySocialId(provider, id);
 
-    if (!existingUser) {
-      return this.prisma.user.create({
-        data: {
-          email,
-          name,
-        },
+    // 사용자가 없으면 생성 (회원가입)
+    if (!user) {
+      user = await this.userService.create({
+        email,
+        name,
+        profileImage: picture,
+        provider,
+        providerId: id,
       });
     }
 
-    return existingUser; // 이미 등록된 사용자 반환
-  }
-  async kakaoLogin(req: any) {
-    const { email, name } = req.user;
-
-    // 사용자 정보 저장 (이미 존재하면 업데이트 또는 무시)
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!existingUser) {
-      return this.prisma.user.create({
-        data: {
-          email,
-          name,
-        },
-      });
-    }
-
-    return existingUser; // 이미 등록된 사용자 반환
+    // 유저 정보를 반환하거나, 토큰 발급 로직을 추가
+    return {
+      message: '소셜 로그인 성공',
+      user,
+    };
   }
 }
