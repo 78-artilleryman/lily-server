@@ -27,22 +27,22 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    try {
-      const { name, emails, photos } = profile;
+    // 프로필 데이터 매핑
+    const user = {
+      id: profile.id || profile.sub || null, // Google 사용자 ID
+      email: profile.email || profile.emails?.[0]?.value || null, // 이메일
+      name: `${profile.name?.familyName || ''}${profile.name?.givenName || ''}`.trim(),
+      picture: profile.picture || profile.photos?.[0]?.value || null, // 프로필 사진
+    };
 
-      const user = {
-        email: emails[0].value, // Google 계정 이메일
-        firstName: name?.givenName || null, // 이름
-        lastName: name?.familyName || null, // 성
-        picture: photos?.[0]?.value || null, // 프로필 사진
-        accessToken, // 액세스 토큰
-      };
-
-      return done(null, user); // 인증 성공 시 사용자 정보 반환
-    } catch (error) {
+    // 프로필 데이터 검증
+    if (!user.id || !user.email) {
+      console.error('Google 프로필 데이터가 올바르지 않습니다:', user);
       throw new UnauthorizedException(
-        `Google 인증 실패: ${error.message || '알 수 없는 오류'}`,
+        'Google 프로필 데이터가 올바르지 않습니다.',
       );
     }
+
+    return done(null, user); // 매핑된 사용자 데이터 반환
   }
 }

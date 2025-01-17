@@ -27,13 +27,13 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
     profile: any,
   ): Promise<any> {
     try {
-      const { id, email, nickname, profileImage } = profile;
+      console.log(profile);
+      const { id, _json } = profile;
       const user = {
-        naverId: id, // 네이버에서 제공하는 고유 사용자 ID
-        email: email || null, // 이메일 (선택적 제공)
-        nickname: nickname || null, // 닉네임
-        profileImage: profileImage || null, // 프로필 이미지
-        accessToken, // 액세스 토큰
+        id: id, // 네이버에서 제공하는 고유 사용자 ID
+        email: _json.email || null, // 이메일 (선택적 제공)
+        name: _json.nickname || null, // 닉네임
+        picture: _json.profile_image || null, // 프로필 이미지
       };
       return user; // 인증 성공 시 반환할 사용자 객체
     } catch (error) {

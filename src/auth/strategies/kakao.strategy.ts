@@ -18,13 +18,15 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     profile: any,
   ): Promise<any> {
     try {
-      const { id, _json } = profile;
       const user = {
-        kakaoId: id,
-        name: _json.properties.nickname,
-        email: _json.kakao_account?.email || null,
-        profileImage: _json.properties.profile_image,
-        accessToken,
+        id: profile.id + '', // 최상위 사용자 ID
+        email: profile._json.kakao_account?.email || null, // 이메일 (kakao_account에 위치)
+        name:
+          profile._json.properties?.nickname ||
+          profile.displayName ||
+          'Unknown', // 닉네임
+        picture: profile._json.properties?.profile_image || null, // 프로필 이미지
+        accessToken, // Kakao 액세스 토큰
       };
       return user;
     } catch (error: any) {
