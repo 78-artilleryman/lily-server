@@ -1,13 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly userService: UserService,
-    private readonly jwtService: JwtService, // JWT 발급용
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   // 소셜 로그인
   async socialLogin(provider: string, profile: any) {
@@ -32,30 +28,9 @@ export class AuthService {
       });
     }
 
-    // JWT 토큰 발급
-    const tokens = this.generateTokens(user.id, user.email);
-
     return {
       message: '소셜 로그인 성공',
       user,
-      tokens,
-    };
-  }
-
-  // JWT 토큰 생성 메서드
-  private generateTokens(userId: string, email: string) {
-    const payload = { sub: userId, email };
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '1h',
-    });
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
-    });
-
-    return {
-      accessToken,
-      refreshToken,
-      expiresIn: 3600,
     };
   }
 }
