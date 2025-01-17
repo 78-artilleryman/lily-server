@@ -3,12 +3,13 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { GoogleStrategy } from './strategies/google.strategy';
-import { PrismaModule } from 'src/prisma/prisma.module';
 import { KakaoStrategy } from './strategies/kakao.strategy';
+import { NaverStrategy } from './strategies/naver.strategy';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [PassportModule, PrismaModule],
-  controllers: [AuthController],
-  providers: [AuthService, GoogleStrategy, KakaoStrategy],
+  imports: [PassportModule, UserModule], // UserModule과 PassportModule 임포트
+  controllers: [AuthController], // AuthController 등록
+  providers: [AuthService, GoogleStrategy, KakaoStrategy, NaverStrategy],
 })
 export class AuthModule {}
