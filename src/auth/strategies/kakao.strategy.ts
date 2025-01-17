@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-kakao';
 
@@ -17,14 +17,20 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     refreshToken: string,
     profile: any,
   ): Promise<any> {
-    const { id, username, _json } = profile;
-    const user = {
-      kakaoId: id,
-      name: username || _json.properties.nickname,
-      email: _json.kakao_account.email,
-      profileImage: _json.properties.profile_image,
-      accessToken,
-    };
-    return user;
+    try {
+      const { id, _json } = profile;
+      const user = {
+        kakaoId: id,
+        name: _json.properties.nickname,
+        email: _json.kakao_account?.email || null,
+        profileImage: _json.properties.profile_image,
+        accessToken,
+      };
+      return user;
+    } catch (error: any) {
+      throw new UnauthorizedException(
+        `Kakao 인증 실패: ${error.message || '알 수 없는 오류'}`,
+      );
+    }
   }
 }

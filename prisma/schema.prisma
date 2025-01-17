@@ -11,32 +11,37 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// User 엔티티: 소셜 로그인을 포함한 사용자 정보를 관리하는 테이블
 model User {
-  id          String  @id @default(cuid())
-  email       String? @unique
-  name        String?
-  profileImage String?
-  provider    String
-  providerId  String
-  refreshToken String?  // Refresh Token 필드 추가
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid()) // 유저의 고유 ID
+  email        String?  @unique            // 유저 이메일 (소셜 로그인 시 선택적으로 제공됨)
+  name         String?                     // 유저 이름
+  profileImage String?                     // 유저 프로필 이미지 URL
+  provider     String                      // 소셜 로그인 제공자 (e.g., 'google', 'kakao', 'naver')
+  providerId   String                      // 소셜 로그인 제공자의 고유 ID
+  refreshToken String?                     // 소셜 로그인 갱신 토큰
+  createdAt    DateTime @default(now())    // 유저 생성 시간
+  updatedAt    DateTime @updatedAt         // 유저 정보 마지막 업데이트 시간
+  lastLoginAt  DateTime?                   // 유저 마지막 로그인 시간
+  isActive     Boolean  @default(true)     // 유저 활성화 여부
 
-  accounts    Account[] // 다대일 관계 설정
-  @@unique([provider, providerId])
+  accounts     Account[]                   // 다대일 관계: 하나의 유저는 여러 소셜 계정을 가질 수 있음
+
+  @@unique([provider, providerId])         // 동일 제공자와 제공자 ID로 유저 중복 방지
 }
 
+// Account 엔티티: 소셜 로그인 계정을 관리하는 테이블
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  token_type         String?
-  scope              String?
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                 String  @id @default(cuid()) // 계정의 고유 ID
+  userId             String                      // 연결된 유저의 ID
+  provider           String                      // 소셜 로그인 제공자 (e.g., 'google', 'kakao', 'naver')
+  providerAccountId  String                      // 소셜 로그인 제공자의 계정 ID
+  refresh_token      String?  @db.Text           // 소셜 로그인 갱신 토큰
+  access_token       String?  @db.Text           // 소셜 로그인 액세스 토큰
+  token_type         String?                     // 액세스 토큰 유형 (e.g., 'Bearer')
+  scope              String?                     // 액세스 권한 범위 (e.g., 'email profile')
+  expires_at         Int?                        // 액세스 토큰 만료 시간 (UNIX timestamp)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade) // 유저와의 관계 설정
 
-  @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])        // 동일 제공자와 계정 ID로 계정 중복 방지
 }
-
